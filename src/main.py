@@ -134,6 +134,11 @@ class ItemsLoader:
                 html_content += f'<div class="item"><img src="https://raw.githubusercontent.com/any2cards/frosthaven/master/images/{item.image}" alt="{item.item_id}"><p>{item.item_id}</p></div>\n'
 
         html_content += """
+        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/1-14/gh-010-war-hammer.png" alt="GH-10"><p>GH-10</p></div>\n
+        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/22-28/gh-025-jagged-sword.png" alt="GH-25"><p>GH-25</p></div>\n
+        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/64-151/gh-072b-shoes-of-happiness.png" alt="GH-72"><p>GH-72</p></div>\n
+        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/64-151/gh-105-flea-bitten-shawl.png" alt="GH-105"><p>GH-105</p></div>\n
+        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/64-151/gh-109-thiefs-hood.png" alt="GH-109"><p>GH-109</p></div>\n        <div class="item"><img src="https://raw.githubusercontent.com/any2cards/gloomhaven/master/images/items/gloomhaven/64-151/gh-116-fueled-falchion.png" alt="GH-116"><p>GH-116</p></div>\n
         </body>
         </html>
         """
