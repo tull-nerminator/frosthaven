@@ -1,8 +1,25 @@
-import json
 import re
+import requests
 
 # Update this list
-unlocked_item_list = ["1-25", "57-58", "61", "72", "76-77", "81", "83", "85-88", "90-94", "97", "119", "246"]
+UNLOCKED_ITEM_LIST = [
+    "1-25",
+    "57-58",
+    "61",
+    "72",
+    "76-77",
+    "81",
+    "83",
+    "85-88",
+    "90-94",
+    "97",
+    "119",
+    "246",
+]
+
+ANY2_CARDS_URL = "https://raw.githubusercontent.com/any2cards/"
+REMOTE_FILE_URL = ANY2_CARDS_URL + "frosthaven/master/data/items.js"
+
 
 class Item:
     def __init__(self, item_id, points, expansion, image, xws):
@@ -15,18 +32,18 @@ class Item:
     def __repr__(self):
         return f"Item(name={self.item_id}, points={self.points}, expansion={self.expansion}, image={self.image}, xws={self.xws})"
 
+
 class ItemsLoader:
-    def __init__(self, filepath):
-        self.filepath = filepath
+    def __init__(self):
         self.items = self.load_items()
-        self.valid_numbers = self.parse_number_list(unlocked_item_list)
+        self.valid_numbers = self.parse_number_list(UNLOCKED_ITEM_LIST)
 
     def parse_number_list(self, number_list):
         valid_numbers = set()
         for part in number_list:
             part = part.strip()
-            if '-' in part:
-                start, end = map(int, part.split('-'))
+            if "-" in part:
+                start, end = map(int, part.split("-"))
                 valid_numbers.update(range(start, end + 1))
             else:
                 valid_numbers.add(int(part))
@@ -34,15 +51,17 @@ class ItemsLoader:
 
     def normalize_name(self, name):
         # Remove non-alphanumeric characters and leading zeros
-        normalized_name = re.sub(r'\W+', '', name).lstrip('0').lower()
+        normalized_name = re.sub(r"\W+", "", name).lstrip("0").lower()
         # Ensure the name contains a number
-        if not re.search(r'\d', normalized_name):
+        if not re.search(r"\d", normalized_name):
             return None
-        return int(normalized_name.strip('item'))
+        return int(normalized_name.strip("item"))
 
     def load_items(self):
-        with open(self.filepath, 'r') as file:
-            data = json.load(file)
+        response = requests.get(REMOTE_FILE_URL)
+        response.raise_for_status()
+
+        data = response.json()
 
         item_names = set()
         items = []
@@ -50,20 +69,22 @@ class ItemsLoader:
             normalized_name = self.normalize_name(item["name"])
             if normalized_name and normalized_name not in item_names:
                 item_names.add(normalized_name)
-                items.append(Item(
-                    item_id=normalized_name,
-                    points=item["points"],
-                    expansion=item["expansion"],
-                    image=item["image"],
-                    xws=item["xws"]
-                ))
+                items.append(
+                    Item(
+                        item_id=normalized_name,
+                        points=item["points"],
+                        expansion=item["expansion"],
+                        image=item["image"],
+                        xws=item["xws"],
+                    )
+                )
         return items
 
     def print_items(self):
         for item in self.items:
             print(item)
 
-    def generate_html(self, output_filepath='../index.html'):
+    def generate_html(self, output_filepath="../index.html"):
         html_content = """
         <html>
         <head>
@@ -110,23 +131,24 @@ class ItemsLoader:
         """
         for item in self.items:
             if item.item_id in self.valid_numbers:
-                html_content += f'<div class="item"><img src="{item.image}" alt="{item.item_id}"><p>{item.item_id}</p></div>\n'
-        
+                html_content += f'<div class="item"><img src="https://raw.githubusercontent.com/any2cards/frosthaven/master/images/{item.image}" alt="{item.item_id}"><p>{item.item_id}</p></div>\n'
+
         html_content += """
         </body>
         </html>
         """
 
-        with open(output_filepath, 'w') as file:
+        with open(output_filepath, "w") as file:
             file.write(html_content)
 
         print(f"HTML page generated at {output_filepath}")
 
+
 def main():
-    filepath = '../data/items.js'
-    loader = ItemsLoader(filepath)
-    #loader.print_items()
+    loader = ItemsLoader()
+    # loader.print_items()
     loader.generate_html()
+
 
 if __name__ == "__main__":
     main()
